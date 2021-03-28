@@ -7,7 +7,7 @@ import java.net.Socket;
 public abstract class Worker extends Thread {
     Queue<Socket> waitingQueue;
 
-    abstract void main_routine();
+    abstract void main_routine(); // Force implementation of this class
 
     public Worker() {
         waitingList = new LinkedList<>();
