@@ -1,19 +1,20 @@
 package pooler;
 
-import java.util.Queue;
-import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.Collection;
+
+import java.lang.InterruptedException;
+
 import java.net.Socket;
 
 public abstract class Worker extends Thread {
-    Queue<Socket> waitingQueue;
-
-    abstract void main_routine(); // Force implementation of this class
+    public static BlockingQueue<Socket> waitingQueue;
 
     public Worker() {
-        waitingList = new LinkedList<>();
+        waitingQueue = new BlockingQueue<>();
     }
 
-    public void wait(Socket Client) {
-        waitingList.add(Client);
+    public void add_to_waiting_list(Socket Client) {
+        waitingQueue.add(Client);
     }
 }
