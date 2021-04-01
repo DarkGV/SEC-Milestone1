@@ -1,4 +1,4 @@
-package pooler;
+package pt.ulisboa.tecnico.pooler;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.Collection;
@@ -10,6 +10,8 @@ import java.net.Socket;
 public abstract class Worker extends Thread {
     public static BlockingQueue<Socket> waitingQueue;
 
+    public void run() {}
+
     public Worker() {
         waitingQueue = new BlockingQueue<>();
     }
@@ -18,3 +20,8 @@ public abstract class Worker extends Thread {
         waitingQueue.add(Client);
     }
 }
+
+
+
+
+

@@ -37,7 +37,7 @@ public class Pooler {
     }
 
     public void spinUp() {
-        Thread worker = new Thread(workerClass.newInstance());
+        Thread worker = new Thread((Worker)workerClass.getDeclaredConstructor().newInstance());
         worker.start();
         workers.add(worker);
         instantiatedWorkers++;
@@ -52,7 +52,7 @@ public class Pooler {
         if(nmrWorkers == instantiatedWorkers) return;
 
         try {
-            Thread worker = new Thread(workerClass.newInstance());
+            Thread worker = new Thread((Worker)workerClass.getDeclaredConstructor().newInstance());
             worker.start(); // before saving it to the list of threads, try start it
             workers.add(worker);
         } catch(NoSuchMethodException noSuchMethodExceptionHandler) {
