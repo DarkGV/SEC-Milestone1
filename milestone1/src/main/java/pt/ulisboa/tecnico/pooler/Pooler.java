@@ -78,7 +78,7 @@ public class Pooler {
             worker.interrupt();
             worker.join();
 	} catch(InterruptedException interrupted) {
-	    System.out.println("Gracefulle stopped the thread");
+	    System.out.println("Gracefully stopped the thread");
 	}
     }
 }
