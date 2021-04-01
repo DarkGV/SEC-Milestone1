@@ -8,23 +8,32 @@ import java.util.ArrayList;
 
 import java.net.Socket;
 
+// Java exception
+import java.lang.reflect.InvocationTargetException;
+import java.lang.ClassNotFoundException;
 import java.lang.NoSuchMethodException;
+import java.lang.NoSuchMethodException;
+import java.lang.IllegalAccessException;
+import java.lang.NoSuchMethodException;
+import java.lang.InstantiationException;
+import java.lang.InstantiationException;
+import java.lang.InterruptedException;
 
 public class Pooler {
     int instantiatedWorkers = 10;
     Class workerClass;
     ArrayList<Thread> workers;
 
-    public Pooler(String workerClassName) {
+    public Pooler(String workerClassName) throws ClassNotFoundException {
         workerClass = Class.forName(workerClassName);
         workers = new ArrayList<>();
     }
 
-    public void start_workers() {
+    public void start_workers() throws InstantiationException, IllegalAccessException, InvocationTargetException {
         start_workers(0);
     }
 
-    public void insertClient(Socket client) {
+    public void insertClient(Socket client) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Class[] add_to_waiting_list_parameters = new Class[1];
         add_to_waiting_list_parameters[0] = Socket.class;
         Method add_to_waiting_list = workerClass.getMethod("add_to_waiting_list", add_to_waiting_list_parameters);
@@ -36,7 +45,7 @@ public class Pooler {
         return instantiatedWorkers;
     }
 
-    public void spinUp() {
+    public void spinUp() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         Thread worker = new Thread((Worker)workerClass.getDeclaredConstructor().newInstance());
         worker.start();
         workers.add(worker);
@@ -48,7 +57,7 @@ public class Pooler {
     }
 
     // Private code
-    private void start_workers(int nmrWorkers) {
+    private void start_workers(int nmrWorkers) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         if(nmrWorkers == instantiatedWorkers) return;
 
         try {
@@ -65,7 +74,11 @@ public class Pooler {
     }
 
     private void gracefullyStopThread(Thread worker) {
-        worker.interrupt();
-        worker.join();
+	try {
+            worker.interrupt();
+            worker.join();
+	} catch(InterruptedException interrupted) {
+	    System.out.println("Gracefulle stopped the thread");
+	}
     }
 }
