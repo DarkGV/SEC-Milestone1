@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico;
 
+import pt.ulisboa.tecnico.pooler.*;
 /**
  * Hello world!
  *
