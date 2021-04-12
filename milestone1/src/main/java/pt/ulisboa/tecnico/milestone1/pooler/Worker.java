@@ -1,11 +1,7 @@
-package pt.ulisboa.tecnico.pooler;
+package pt.ulisboa.tecnico.milestone1.pooler;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.Collection;
-
-import java.lang.InterruptedException;
-
 import java.net.Socket;
 
 public abstract class Worker extends Thread {
@@ -14,15 +10,10 @@ public abstract class Worker extends Thread {
     public void run() {}
 
     public Worker() {
-        waitingQueue = new ArrayBlockingQueue<Socket>(10);
+        waitingQueue = new ArrayBlockingQueue<>(10);
     }
 
-    public void add_to_waiting_list(Socket Client) {
+    public void addToWaitingList(Socket Client) {
         waitingQueue.add(Client);
     }
 }
-
-
-
-
-

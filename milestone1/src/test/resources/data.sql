@@ -1,0 +1,18 @@
+-- Database for SEC Project
+
+DROP TABLE USER;
+DROP TABLE USER_LOC;
+
+CREATE TABLE USER (
+	ID		int		PRIMARY KEY	NOT NULL,
+	NAME	VARCHAR	UNIQUE      NOT NULL
+);
+
+CREATE TABLE USER_LOC (
+	EPOCH	        int		    NOT NULL,
+	USER_ID	        int		    NOT NULL,
+	COORDS_X        int	        NOT NULL,
+	COORDS_Y        int 	    NOT NULL,
+	PRIMARY KEY		(EPOCH, USER_ID),
+	FOREIGN KEY		(USER_ID)	REFERENCES User (ID)
+);

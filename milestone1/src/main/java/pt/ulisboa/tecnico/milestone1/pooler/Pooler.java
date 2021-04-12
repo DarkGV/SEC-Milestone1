@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.pooler;
+package pt.ulisboa.tecnico.milestone1.pooler;
 
 import java.lang.reflect.*;
 import java.lang.Thread;
@@ -12,16 +12,12 @@ import java.net.Socket;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.ClassNotFoundException;
 import java.lang.NoSuchMethodException;
-import java.lang.NoSuchMethodException;
 import java.lang.IllegalAccessException;
-import java.lang.NoSuchMethodException;
 import java.lang.InstantiationException;
-import java.lang.InstantiationException;
-import java.lang.InterruptedException;
 
 public class Pooler {
     int instantiatedWorkers = 10;
-    Class workerClass;
+    Class<?> workerClass;
     ArrayList<Thread> workers;
 
     public Pooler(String workerClassName) throws ClassNotFoundException {
@@ -29,19 +25,19 @@ public class Pooler {
         workers = new ArrayList<>();
     }
 
-    public void start_workers() throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        start_workers(0);
+    public void startWorkers() throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        startWorkers(0);
     }
 
     public void insertClient(Socket client) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Class[] add_to_waiting_list_parameters = new Class[1];
-        add_to_waiting_list_parameters[0] = Socket.class;
-        Method add_to_waiting_list = workerClass.getMethod("add_to_waiting_list", add_to_waiting_list_parameters);
+        Class<?>[] addToWaitingListParameters = new Class<?>[1];
+        addToWaitingListParameters[0] = Socket.class;
+        Method addToWaitingList = workerClass.getMethod("addToWaitingList", addToWaitingListParameters);
 
-        add_to_waiting_list.invoke(null, client); // invoke the class
+        addToWaitingList.invoke(null, client); // invoke the class
     }
 
-    public int number_of_workers() {
+    public int getNumberOfWorkers() {
         return instantiatedWorkers;
     }
 
@@ -57,7 +53,7 @@ public class Pooler {
     }
 
     // Private code
-    private void start_workers(int nmrWorkers) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    private void startWorkers(int nmrWorkers) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         if(nmrWorkers == instantiatedWorkers) return;
 
         try {
@@ -66,19 +62,19 @@ public class Pooler {
             workers.add(worker);
         } catch(NoSuchMethodException noSuchMethodExceptionHandler) {
             System.out.println("Method `main_routine` does not exist in class " + workerClass.getName()
-                                + ".\nDoes this class extends class worker?"); // Provide some advice
+                    + ".\nDoes this class extends class worker?"); // Provide some advice
             return; // and stop executing
         }
 
-        start_workers(nmrWorkers+1);
+        startWorkers(nmrWorkers+1);
     }
 
     private void gracefullyStopThread(Thread worker) {
-	try {
+        try {
             worker.interrupt();
             worker.join();
-	} catch(InterruptedException interrupted) {
-	    System.out.println("Gracefully stopped the thread");
-	}
+        } catch(InterruptedException interrupted) {
+            System.out.println("Gracefully stopped the thread");
+        }
     }
 }
