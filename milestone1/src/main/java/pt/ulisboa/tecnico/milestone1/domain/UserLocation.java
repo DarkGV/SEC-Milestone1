@@ -6,25 +6,33 @@ import javax.persistence.*;
 @Table(name = "USER_LOC")
 public class UserLocation {
 
-    @EmbeddedId
-    private UserLocationId userLocationId;
+    @Id
+    @GeneratedValue
+    @Column(name = "ID", unique = true, nullable = false)
+    private int id;
 
-    @Column(name = "COORDS_X", unique = true, nullable = false)
+    @Column(name = "USER_ID", nullable = false)
+    private int userId;
+
+    @Column(name = "EPOCH", nullable = false)
+    private int epoch;
+
+    @Column(name = "COORDS_X", nullable = false)
     private int coordsX;
 
-    @Column(name = "COORDS_Y", unique = true, nullable = false)
+    @Column(name = "COORDS_Y", nullable = false)
     private int coordsY;
 
-    public UserLocation(UserLocationId userLocationId, int coordsX, int coordsY) {
-        this.userLocationId = userLocationId;
+    public UserLocation(Integer id, int userId, int epoch, int coordsX, int coordsY) {
+        this.id = id;
+        this.userId = userId;
+        this.epoch = epoch;
         this.coordsX = coordsX;
         this.coordsY = coordsY;
     }
 
     public UserLocation(int userId, int epoch, int coordsX, int coordsY) {
-        this.userLocationId = new UserLocationId(userId, epoch);
-        this.coordsX = coordsX;
-        this.coordsY = coordsY;
+        new UserLocation(null, userId, epoch, coordsX, coordsY)
     }
 
     public UserLocation() {
@@ -46,11 +54,27 @@ public class UserLocation {
         this.coordsY = coordsY;
     }
 
-    public UserLocationId getUserLocationId() {
-        return userLocationId;
+    public int getId() {
+        return id;
     }
 
-    public void setUserLocationId(UserLocationId userLocationId) {
-        this.userLocationId = userLocationId;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getEpoch() {
+        return epoch;
+    }
+
+    public void setEpoch(int epoch) {
+        this.epoch = epoch;
     }
 }

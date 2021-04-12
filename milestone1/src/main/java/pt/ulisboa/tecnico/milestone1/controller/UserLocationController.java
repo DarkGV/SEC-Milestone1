@@ -27,13 +27,13 @@ public class UserLocationController {
     @GetMapping("/get/{userId}/{epoch}")
     public UserLocation getUserLocationAtEpoch(@PathVariable("userId") int userId,
                                                @PathVariable("epoch") int epoch){
-        return userLocationRepository.findUserLocationByUserLocationId_UserIdAndUserLocationId_Epoch(userId, epoch);
+        return userLocationRepository.findUserLocationByUserIdAndEpoch(userId, epoch);
     }
 
     @GetMapping("/getList/{x}/{y}/{epoch}")
     public List<UserLocation> listUsersAtLocation(@PathVariable("x") int coordsX,
                                                   @PathVariable("y") int coordsY,
                                                   @PathVariable("epoch") int epoch){
-        return userLocationRepository.findAllByCoordsXAndCoordsYAndUserLocationId_Epoch(coordsX, coordsY, epoch);
+        return userLocationRepository.findAllByCoordsXAndCoordsYAndEpoch(coordsX, coordsY, epoch);
     }
 }
