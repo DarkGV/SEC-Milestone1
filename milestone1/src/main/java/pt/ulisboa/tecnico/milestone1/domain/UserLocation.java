@@ -32,7 +32,7 @@ public class UserLocation {
     }
 
     public UserLocation(int userId, int epoch, int coordsX, int coordsY) {
-        new UserLocation(null, userId, epoch, coordsX, coordsY)
+        new UserLocation(null, userId, epoch, coordsX, coordsY);
     }
 
     public UserLocation() {

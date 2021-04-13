@@ -14,6 +14,7 @@
 	<name>milestone1</name>
 	<properties>
 		<java.version>11</java.version>
+		<start-class>pt.ulisboa.tecnico.milestone1.Milestone1Application</start-class>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,6 +47,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${start-class}</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
