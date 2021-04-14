@@ -7,23 +7,24 @@ import javax.persistence.*;
 public class UserLocation {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UserLocationSequence", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "UserLocationSequence", sequenceName = "USER_LOC_SEQ")
     @Column(name = "ID", unique = true, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "USER_ID", nullable = false)
-    private int userId;
+    private Long userId;
 
     @Column(name = "EPOCH", nullable = false)
-    private int epoch;
+    private Long epoch;
 
     @Column(name = "COORDS_X", nullable = false)
-    private int coordsX;
+    private Long coordsX;
 
     @Column(name = "COORDS_Y", nullable = false)
-    private int coordsY;
+    private Long coordsY;
 
-    public UserLocation(Integer id, int userId, int epoch, int coordsX, int coordsY) {
+    public UserLocation(Long id, Long userId, Long epoch, Long coordsX, Long coordsY) {
         this.id = id;
         this.userId = userId;
         this.epoch = epoch;
@@ -31,50 +32,53 @@ public class UserLocation {
         this.coordsY = coordsY;
     }
 
-    public UserLocation(int userId, int epoch, int coordsX, int coordsY) {
-        new UserLocation(null, userId, epoch, coordsX, coordsY);
+    public UserLocation(Long userId, Long epoch, Long coordsX, Long coordsY) {
+        this.userId = userId;
+        this.epoch = epoch;
+        this.coordsX = coordsX;
+        this.coordsY = coordsY;
     }
 
     public UserLocation() {
     }
 
-    public int getCoordsX() {
+    public Long getCoordsX() {
         return coordsX;
     }
 
-    public void setCoordsX(int coordsX) {
+    public void setCoordsX(Long coordsX) {
         this.coordsX = coordsX;
     }
 
-    public int getCoordsY() {
+    public Long getCoordsY() {
         return coordsY;
     }
 
-    public void setCoordsY(int coordsY) {
+    public void setCoordsY(Long coordsY) {
         this.coordsY = coordsY;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
-    public int getEpoch() {
+    public Long getEpoch() {
         return epoch;
     }
 
-    public void setEpoch(int epoch) {
+    public void setEpoch(Long epoch) {
         this.epoch = epoch;
     }
 }

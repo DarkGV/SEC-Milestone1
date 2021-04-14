@@ -1,39 +1,40 @@
 package pt.ulisboa.tecnico.milestone1.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pt.ulisboa.tecnico.milestone1.domain.UserLocation;
-import pt.ulisboa.tecnico.milestone1.repository.UserLocationRepository;
+import pt.ulisboa.tecnico.milestone1.dto.UserReport;
+import pt.ulisboa.tecnico.milestone1.service.UserService;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/userlocation")
 public class UserLocationController {
     @Autowired
-    private UserLocationRepository userLocationRepository;
+    private UserService userService;
 
-    @GetMapping("/create/{userId}/{epoch}/{x}/{y}")
-    public UserLocation createUserLocation(@PathVariable("userId") int userId,
-                                           @PathVariable("epoch") int epoch,
-                                           @PathVariable("x") int coordsX,
-                                           @PathVariable("y") int coordsY){
-        return userLocationRepository.save(new UserLocation(userId, epoch, coordsX, coordsY));
+    @GetMapping("/obtainLocationReport/{userId}/{epoch}/{callerUserId}/{isHa}")
+    public UserReport obtainLocationReport(@PathVariable("userId") long userId,
+                                           @PathVariable("epoch") long epoch,
+                                           @PathVariable("callerUserId") long callerUserId,
+                                           @PathVariable("isHa") boolean isHa) throws Exception {
+        return userService.obtainLocationReport(userId, epoch, callerUserId, isHa);
     }
 
-    @GetMapping("/get/{userId}/{epoch}")
-    public UserLocation getUserLocationAtEpoch(@PathVariable("userId") int userId,
-                                               @PathVariable("epoch") int epoch){
-        return userLocationRepository.findUserLocationByUserIdAndEpoch(userId, epoch);
+    @GetMapping("/submitLocationReport/{userId}/{epoch}/{pos}")
+    public UserReport submitLocationReport(@PathVariable("userId") long userId,
+                                           @PathVariable("epoch") long epoch,
+                                           @PathVariable("pos") String pos) throws Exception {
+        return userService.submitUserLocation(userId, epoch, pos);
     }
 
-    @GetMapping("/getList/{x}/{y}/{epoch}")
-    public List<UserLocation> listUsersAtLocation(@PathVariable("x") int coordsX,
-                                                  @PathVariable("y") int coordsY,
-                                                  @PathVariable("epoch") int epoch){
-        return userLocationRepository.findAllByCoordsXAndCoordsYAndEpoch(coordsX, coordsY, epoch);
+    @GetMapping("/obtainUsersAtLocation/{pos}/{epoch}/{isHa}")
+    public List<UserReport> obtainUsersAtLocation(@PathVariable("pos") String pos,
+                                                  @PathVariable("epoch") long epoch,
+                                                  @PathVariable("isHa") boolean isHa) throws Exception {
+        return userService.obtainUsersAtLocation(epoch, pos, isHa);
     }
 }
