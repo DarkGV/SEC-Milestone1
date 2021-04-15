@@ -2,11 +2,9 @@ package pt.ulisboa.tecnico.milestone1.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.milestone1.dto.UserReport;
+import pt.ulisboa.tecnico.milestone1.dto.UserReportRequest;
 import pt.ulisboa.tecnico.milestone1.service.UserService;
 
 import java.util.List;
@@ -24,11 +22,9 @@ public class UserLocationController {
         return userService.obtainLocationReport(userId, epoch, callerUserId, isHa);
     }
 
-    @GetMapping("/submitLocationReport/{userId}/{epoch}/{pos}")
-    public UserReport submitLocationReport(@PathVariable("userId") long userId,
-                                           @PathVariable("epoch") long epoch,
-                                           @PathVariable("pos") String pos) throws Exception {
-        return userService.submitUserLocation(userId, epoch, pos);
+    @PostMapping("/submitLocationReport")
+    public UserReport submitLocationReport(@RequestBody UserReportRequest userReportRequest) throws Exception {
+        return userService.submitUserLocation(userReportRequest);
     }
 
     @GetMapping("/obtainUsersAtLocation/{pos}/{epoch}/{isHa}")

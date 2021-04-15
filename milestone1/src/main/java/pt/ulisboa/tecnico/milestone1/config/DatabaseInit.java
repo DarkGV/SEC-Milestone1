@@ -21,29 +21,59 @@ public class DatabaseInit implements ApplicationRunner {
     @Autowired
     private UserLocationRepository userLocationRepository;
 
-    @Value("${user.count:25}")
-    private int userCount;
-
-    @Value("${grid.value.min:0}")
-    private int gridMin;
-
-    @Value("${grid.value.max:50}")
-    private int gridMax;
+    @Autowired
+    private GridConfig config;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        for (int i = 1; i <= userCount; i++){
-            User user = userRepository.save(new User("n" + i));
+        createRegularUsers();
+        createByzantineUsers();
+    }
+
+    private void createRegularUsers(){
+        for (int i = 1; i <= config.getUsers(); i++){
+            String name = "u" + i;
+
+            if (userRepository.existsByName(name)) {
+                break;
+            }
+
+            User user = userRepository.save(new User(name));
             userLocationRepository.save(
                     new UserLocation(
                             user.getId(),
                             0L,
-                            generateRandomLong(gridMin, gridMax),
-                            generateRandomLong(gridMin, gridMax)));
+                            generateRandomLong(config.getMin(), config.getMax()),
+                            generateRandomLong(config.getMin(), config.getMax())));
+        }
+    }
+
+    private void createByzantineUsers(){
+        for (int i = 1; i <= config.getByzantineUsers(); i++) {
+            String name = "b" + i;
+
+            if (userRepository.existsByName(name)) {
+                break;
+            }
+
+            User user = userRepository.save(new User(name));
+
+            for (int j = 1; j <= generateRandomInt(2, config.getMaxByzantineLocations()); j++) {
+                userLocationRepository.save(
+                        new UserLocation(
+                                user.getId(),
+                                0L,
+                                generateRandomLong(config.getMin(), config.getMax()),
+                                generateRandomLong(config.getMin(), config.getMax())));
+            }
         }
     }
 
     private Long generateRandomLong(int min, int max){
-        return Long.valueOf(new Random().ints(min, max + 1).findFirst().getAsInt());
+        return (long) generateRandomInt(min, max);
+    }
+
+    private Integer generateRandomInt(int min, int max){
+        return new Random().ints(min, max + 1).findFirst().getAsInt();
     }
 }

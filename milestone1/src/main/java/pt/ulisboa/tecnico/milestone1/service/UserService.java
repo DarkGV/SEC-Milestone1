@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pt.ulisboa.tecnico.milestone1.domain.UserLocation;
 import pt.ulisboa.tecnico.milestone1.dto.UserReport;
+import pt.ulisboa.tecnico.milestone1.dto.UserReportRequest;
 import pt.ulisboa.tecnico.milestone1.repository.UserLocationRepository;
 import pt.ulisboa.tecnico.milestone1.repository.UserRepository;
 
@@ -19,10 +20,19 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public UserReport submitUserLocation(Long userId, Long epoch, String pos) throws Exception {
-        String[] coords = retrieveCoordsFromPos(pos);
-        UserLocation userLocation = new UserLocation(userId, epoch, Long.valueOf(coords[0]), Long.valueOf(coords[1]));
+    public UserReport submitUserLocation(UserReportRequest userReportRequest) throws Exception {
+        String[] coords = retrieveCoordsFromPos(userReportRequest.getPos());
+        UserLocation userLocation = new UserLocation(
+                userReportRequest.getUserId(),
+                userReportRequest.getEpoch(),
+                Long.valueOf(coords[0]),
+                Long.valueOf(coords[1]));
         validateUserDataForCreation(userLocation);
+
+        validateRegularUsers(
+                userReportRequest.getUserId(),
+                userReportRequest.getEpoch(),
+                userReportRequest.isByzantine());
 
         try {
             return new UserReport(userLocationRepository.save(userLocation));
@@ -37,7 +47,8 @@ public class UserService {
         }
 
         try {
-            return new UserReport(userLocationRepository.findUserLocationByUserIdAndEpoch(userId, epoch));
+            UserLocation userLocation = userLocationRepository.findUserLocationByUserIdAndEpoch(userId, epoch);
+            return userLocation == null ? null : new UserReport(userLocation);
         } catch (Exception e) {
             throw new Exception(DATABASE_ERROR_MESSAGE);
         }
@@ -67,6 +78,14 @@ public class UserService {
             throw new Exception("Invalid pos");
         }
         return coords;
+    }
+
+    private void validateRegularUsers(Long userId, Long epoch, boolean isByzantine) throws Exception{
+        if (!isByzantine){
+            if (obtainLocationReport(userId, epoch, userId, false) != null){
+                throw new Exception();
+            }
+        }
     }
 
     private void validateUserDataForCreation(UserLocation userLocation) throws Exception{
