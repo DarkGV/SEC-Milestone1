@@ -1,6 +1,6 @@
-package pt.ulisboa.tecnico.client;
+package pt.ulisboa.tecnico.milestone1.client;
 
-import ...;
+import java.util.ArrayList;
 
 public class Client {
     String userName;
