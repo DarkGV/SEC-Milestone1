@@ -12,7 +12,7 @@ private class ClientLocationProve {
     }
 
     public String getName() { return clientName; }
-    public String getLocation() { return clientSignature; }
+    public String getSignature() { return clientSignature; }
 }
 
 public class ClientProve {
@@ -35,7 +35,10 @@ public class ClientProve {
 
     @Override
     public String toString() {
-        jsonData = "{ \"CurrentPos\": \n";
-        for
+        jsonData = "{ \"CurrentPos\": \"+ userLocation +\",\n\"userName\":\""+userName+"\",\n\"CurrentEpoch\":\""+userCurrentEpoch+"\",\n\"ClientProves\":[";
+        for (ClientLocationProve prove : clientsProve) {
+            jsonData += "{\"UserName\":\""+prove.getName()+"\",\n\"UserSignature\":\""+prove.getSignature()+"\"},\n";
+        }
+        jsonData += "]}";
     }
 }
