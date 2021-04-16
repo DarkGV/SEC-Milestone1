@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico;
 
+import pt.ulisboa.tecnico.milestone1.client.Client;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -7,34 +9,36 @@ import java.util.List;
 
 public class Grid {
 
+
+    private int epoch =0;
     private int rows = 50;
     private int collumns = 50;
     private int maxDist =1;
 
-    private Map<String, Point> userPositions= new HashMap<>();
-    private ArrayList<String> grid[][] = new ArrayList[rows][collumns];
-    private ArrayList<String> byzantineUsers = new ArrayList<>();
+    private Map<Client, Point> userPositions= new HashMap<>();
+    private ArrayList<Client> grid[][] = new ArrayList[rows][collumns];
+    private ArrayList<Client> byzantineUsers = new ArrayList<>();
 
 
-    public Grid (int rows, int collumns,  ArrayList<String> users, ArrayList<String> byzantineUsers) {
+    public Grid (int rows, int collumns,  ArrayList<Client> users, ArrayList<Client> byzantineUsers) {
         this.rows = rows;
         this.collumns = collumns;
         this.byzantineUsers = byzantineUsers;
 
-        for (String u : users) {
+        for (Client u : users) {
             addRandomPosition(u,false);
 
 
         }
 
     }
-    public Grid (int rows, int collumns,  Map<String, Point> userPositions, ArrayList<String> byzantineUsers){
+    public Grid (int rows, int collumns,  Map<Client, Point> userPositions, ArrayList<Client> byzantineUsers){
         this.rows=rows;
         this.collumns=collumns;
         this.userPositions=userPositions;
         this.byzantineUsers = byzantineUsers;
 
-        for( String u : userPositions.keySet() ){
+        for( Client u : userPositions.keySet() ){
             Point p= userPositions.get(u);
             int posx = p.x;
             int posy = p.y;
@@ -45,12 +49,13 @@ public class Grid {
         }
     }
     public void updateGrid(){
-        List<String> l = new ArrayList<String>(userPositions.keySet());
-         for( String s : l)   {
+        List<Client> l = new ArrayList<>(userPositions.keySet());
+         for( Client s : l)   {
 
              System.out.println(s);
              addRandomPosition(s, true);
          }
+         epoch++;
 
 
     }
@@ -58,16 +63,16 @@ public class Grid {
 
 
 
-    public Point getUserPosition(String user){
+    public Point getUserPosition(Client user){
         return userPositions.get(user);
 
     }
 
-    public ArrayList<String> getNearUsers(String user) {
+    public ArrayList<Client> getNearUsers(Client user) {
 
         moveByzantine();
 
-        ArrayList<String> nearUsers = new ArrayList<>();
+        ArrayList<Client> nearUsers = new ArrayList<>();
         Point p = userPositions.get(user);
         int posx = p.x;
         int posy = p.y;
@@ -79,7 +84,7 @@ public class Grid {
                 if (c < 0)
                     c = 0;
                 if(grid[r][c] != null)
-                    for( String u : grid[r][c])
+                    for( Client u : grid[r][c])
                         nearUsers.add(u);
 
 
@@ -88,7 +93,7 @@ public class Grid {
         return nearUsers;
     }
 
-    public void addRandomPosition(String user,boolean alreadyInGrid){
+    public void addRandomPosition(Client user,boolean alreadyInGrid){
         Random rand = new Random();
         int posx = rand.nextInt(rows);
         int posy = rand.nextInt(collumns);
@@ -99,7 +104,7 @@ public class Grid {
             userPositions.remove(user);
         }
         if( grid[posx][posy] == null)
-            grid[posx][posy]= new ArrayList<String>();
+            grid[posx][posy]= new ArrayList<Client>();
         grid[posx][posy].add(user);
         userPositions.put(user, new Point(posx, posy));
         System.out.println("added");
@@ -108,20 +113,20 @@ public class Grid {
     }
     public void moveByzantine(){
 
-        for (String u : byzantineUsers)
+        for (Client u : byzantineUsers)
             if(userPositions.get(u)!= null)
                 addRandomPosition(u, true);
             else
                 addRandomPosition(u, false);
 
     }
-    public void newUser(String user){
+    public void newUser(Client user){
         addRandomPosition(user, false);
     }
-    public void newUser(String user, int x, int y){
+    public void newUser(Client user, int x, int y){
         if(x <rows & y< collumns) {
             if (grid[x][y] == null)
-                grid[x][y] = new ArrayList<String>();
+                grid[x][y] = new ArrayList<Client>();
             
             grid[x][y].add(user);
             userPositions.put(user, new Point(x, y));
@@ -130,10 +135,13 @@ public class Grid {
 
     }
     public void getGrid(){
-        for(String u : userPositions.keySet())
+        for(Client u : userPositions.keySet())
             System.out.println("User: " + u + "position: "+ userPositions.get(u));
 
 
+    }
+    public String getEpoch() {
+        return String.valueOf(epoch);
     }
 
 
