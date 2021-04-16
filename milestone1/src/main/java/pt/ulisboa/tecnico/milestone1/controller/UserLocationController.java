@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.milestone1.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.milestone1.dto.UserReport;
 import pt.ulisboa.tecnico.milestone1.dto.UserReportRequest;
