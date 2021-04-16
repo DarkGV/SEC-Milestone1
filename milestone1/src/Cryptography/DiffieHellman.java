@@ -1,4 +1,29 @@
-public class DiffieHellman{
+package Cryptography;
+
+import javax.crypto.KeyAgreement;
+import javax.crypto.SecretKey;
+import javax.crypto.interfaces.DHPublicKey;
+import javax.crypto.spec.DHParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+public class DiffieHellman {
+    private KeyAgreement userKeyAgree;
+    private KeyAgreement serverKeyAgree;
+    private KeyAgreement ownKeyAgree = serverKeyAgree;
+    private KeyAgreement otherKeyAgree = userKeyAgree;
+
+    public DiffieHellman(boolean isUser){
+        if(isUser) {
+            ownKeyAgree = userKeyAgree;
+            otherKeyAgree = serverKeyAgree;
+        }
+    }
+
+
     //KEY GENERATION
     public String diffieUserPublicKey() throws NoSuchAlgorithmException, InvalidKeyException {
         // User creates own DH key pair with 2048-bit key size
@@ -16,21 +41,6 @@ public class DiffieHellman{
         return Base64.getEncoder().encodeToString(userPubKeyEnc);
     }
 
-    public void firstPhaseUser(String serverpubkey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
-        /*
-         * User uses server's public key for the first (and only) phase
-         * of her version of the DH
-         * protocol.
-         * Before she can do so, she has to instantiate a DH public key
-         * from sever's encoded key material.
-         */
-        byte [] userPubKeyEnc= Base64.getDecoder().decode(serverpubkey);
-
-        KeyFactory userKeyFac = KeyFactory.getInstance("DH");
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(serverPubKeyEnc);
-        PublicKey serverPubKey = userKeyFac.generatePublic(x509KeySpec);
-        userKeyAgree.doPhase(serverPubKey, true);
-    }
 
     public String diffieServerPublicKey(String userpubkey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidAlgorithmParameterException, InvalidKeyException {
         /*
@@ -53,7 +63,7 @@ public class DiffieHellman{
 
         // Server creates his own DH key pair
         KeyPairGenerator serverKpairGen = KeyPairGenerator.getInstance("DH");
-        serverKpairGen.initialize(dhParamFromuserPubKey);
+        serverKpairGen.initialize(dhParamFromUserPubKey);
         KeyPair serverKpair = serverKpairGen.generateKeyPair();
 
         // server creates and initializes his DH KeyAgreement object
@@ -66,35 +76,39 @@ public class DiffieHellman{
     }
 
 
-    public void firstPhaseServer(String userpubkey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
+    public  void firstPhase(String otherpubkey) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException {
         /*
-         * Server uses user's public key for the first (and only) phase
+         * This entity uses the other party's public key for the first (and only) phase
          * of his version of the DH protocol.
          */
-        byte [] userPubKeyEnc= Base64.getDecoder().decode(userpubkey);
+        byte [] otherPubKeyEnc= Base64.getDecoder().decode(otherpubkey);
 
-        KeyFactory serverKeyFac = KeyFactory.getInstance("DH");
-        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(userPubKeyEnc);
-        PublicKey userPubKey = serverKeyFac.generatePublic(x509KeySpec);
+        KeyFactory ownKeyFac = KeyFactory.getInstance("DH");
+        X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(otherPubKeyEnc);
+        PublicKey otherPubKey = ownKeyFac.generatePublic(x509KeySpec);
 
-        serverKeyAgree.doPhase(userPubKey, true);
+        ownKeyAgree.doPhase(otherPubKey, true);
     }
+
+
+
     /*
-     * At this stage, both hospital and lab have completed the DH key
+     * At this stage, both entities have completed the DH key
      * agreement protocol.
      * Both generate the (same) shared secret.
      */
-    public void generateSharedSecret(String serverpubkey) throws Exception {
+
+    public  SecretKey generateSharedSecret(String otherPubKey) throws Exception {
         /*
-         * Lab uses hospital's public key for the first (and only) phase
+         * The other entity uses own public key for the first (and only) phase
          * of his version of the DH protocol.
          */
-        firstPhaseHospital(serverpubkey);
-        byte[] userSharedSecret = userKeyAgree.generateSecret();
+        firstPhase(otherPubKey);
+        byte[] ownSharedSecret = ownKeyAgree.generateSecret();
 
         // Creating a SecretKey object using the shared secret and use it for encryption.
-        SecretKeySpec userAesKey = new SecretKeySpec(userSharedSecret, 0, 16, "AES");
-        secretKey = userAesKey;
+        return new SecretKeySpec(ownSharedSecret, 0, 16, "AES");
+
     }
 
 }
