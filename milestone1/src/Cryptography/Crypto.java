@@ -1,20 +1,36 @@
-public class Crypto{
+package Cryptography;
+
+import org.bouncycastle.asn1.x509.X509Name;
+import org.bouncycastle.jce.PrincipalUtil;
+import org.bouncycastle.jce.X509Principal;
+
+import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.*;
+import java.util.*;
+
+public class Crypto {
     private static String PATH_TO_CERTIFICATE = "path";
     private static String HMAC_ALGORITHM = "HmacSHA256";
     private static String CIFER_ALGORITHM = "AES/CBC/PKCS5Padding";
-    private SecretKey secretKey; //sera que nao faz mais sentido tornar as funçoes abstratas e passar isto como argumento?
 
 
     //VERIFY INTEGRITY
-    public static String getMAC(String key_path, String message) throws Exception {
+    public static String getMAC(String key_path, String message, SecretKey secretKey) throws Exception {
         Mac mac = Mac.getInstance(HMAC_ALGORITHM);
         mac.init(secretKey);
         return Base64.getEncoder().encodeToString(mac.doFinal(message.toString().getBytes()));
     }
 
-    public static boolean checkIntegrity(String mac_in_message, String message) throws Exception{
+    public static boolean checkIntegrity(String mac_in_message, String message, String key_path, SecretKey secretKey) throws Exception{
 
-        String check = getMAC(message) ;
+        String check = getMAC(key_path, message,  secretKey) ;
         System.out.println("Mac in message " + mac_in_message + "Mac calculated "+ check);
         return  mac_in_message.equals(check);
 
@@ -24,7 +40,7 @@ public class Crypto{
     //VERIFY FRESHNESS
 
     //encrypt
-    public String[] encryptWithSecretKey(String plainText) {
+    public static String[] encryptWithSecretKey(String plainText, SecretKey secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
 
         Cipher cipher = Cipher.getInstance(CIFER_ALGORITHM);
         System.out.println("Ciphering "+ plainText);
@@ -32,6 +48,7 @@ public class Crypto{
         byte[] iv = new byte[cipher.getBlockSize()];
         new SecureRandom().nextBytes(iv);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(iv));
+
 
         String ivString = Base64.getEncoder().encodeToString(iv);
         String cipherText =  Base64.getEncoder().encodeToString(cipher.doFinal(plainText.getBytes()));
@@ -44,11 +61,11 @@ public class Crypto{
 
 
     //decrypt
-    public String decryptWithSecretKey(String cipheredText, byte[] iv) {
+    public static String decryptWithSecretKey(String cipheredText, byte[] iv, SecretKey secretKey) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
 
-        System.out.println("Decryptinh "+ cipheredTextText);
+        System.out.println("Decryptinh "+ cipheredText);
         Cipher cipher = Cipher.getInstance(CIFER_ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, this.secretKey, new IvParameterSpec(iv));
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(iv));
         String result = new String( cipher.doFinal(Base64.getDecoder().decode(cipheredText))) ;
         System.out.println("Decrypted: "+ result);
         return result;
@@ -56,17 +73,19 @@ public class Crypto{
 
 
     //verify certificate
-    public boolean verifyCertificate(String certificateToCheck, String trustedAnchor, String expectedCN) throws FileNotFoundException, CertificateException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        byte [] decoded = org.apache.tomcat.util.codec.binary.Base64.decodeBase64(certificateToCheck.replaceAll("-----BEGIN CERTIFICATE-----\n", "").replaceAll("-----END CERTIFICATE-----", ""));
-        Certificate certToCheck = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
+    public static boolean verifyCertificate(String pathToCertificate, String trustedAnchor, String expectedCN) throws FileNotFoundException, CertificateException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+       // byte [] decoded = org.apache.tomcat.util.codec.binary.Base64.decodeBase64(certificateToCheck.replaceAll("-----BEGIN CERTIFICATE-----\n", "").replaceAll("-----END CERTIFICATE-----", ""));
+       // Certificate certToCheck = CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(decoded));
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        Certificate certToCheck = cf.generateCertificate(new FileInputStream(pathToCertificate));
 
-        //Verify CN
+
         X509Certificate c = (X509Certificate)certToCheck;
         X509Principal principal = PrincipalUtil.getSubjectX509Principal(c);
         Vector<?> subjectCNs = principal.getValues(X509Name.CN);
 
         if(subjectCNs.get(0).equals(expectedCN)) {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            cf = CertificateFactory.getInstance("X.509");
             List list = new ArrayList();
             list.add(certToCheck);
 
@@ -91,13 +110,13 @@ public class Crypto{
     }
 
 
-
-    public String requestConnection(){
+/*
+    public static String requestConnection(){
         File crtFile = new File(PROJECT_PATH + PATH_TO_CERTIFICATE);
         String certificate = Files.readString(crtFile.toPath(), Charset.defaultCharset());
         String userPubKey = diffieUserPublicKey();
         //TO DO: send CERTIFICATE + USERPUBKEY
 
-    }
+    }*/
 
 }
