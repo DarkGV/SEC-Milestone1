@@ -42,7 +42,7 @@ public class UserService {
     }
 
     public UserReport obtainLocationReport(Long userId, Long epoch, Long callerUserId, boolean isHa) throws Exception {
-        if (!isHa && userId != callerUserId) {
+        if (!isHa && !userId.equals(callerUserId)) {
             throw new Exception("Not allowed");
         }
 
